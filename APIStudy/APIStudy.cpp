@@ -125,12 +125,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
     PAINTSTRUCT ps;
-    static TCHAR mStr[80]; //문자열
-    static POINT mPoint;
-    static RECT clientR;
-    HINSTANCE g_hlnst;
-    HWND hWndMain;
-    int chSize = 8;
+    POINT p;
+   
+    static RECT barR, clientR;
+    static int alphaX;
+    HPEN hPen, hOldPen;  //펜
+    HBRUSH hBrush, hOldBrush; //브러쉬
     switch (message)
     {
     
@@ -153,36 +153,53 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_CREATE:
     {
-       hWndMain = hWnd;
-       _tcscpy_s(mStr, _T("MOVING")); //문자열에 쓰는 방법
-       GetClientRect(hWnd, &clientR);
-
-       mPoint = CenterPoint(clientR);
-       mPoint.x -= (_tcslen(mStr) * chSize) / 2; //문자열 정중앙의 위치 계산
+        GetClientRect(hWnd, &clientR); //현재 윈도우 크기 측정후 저장
+        p = CenterPoint(clientR);
+        //중심 위치 p를 이용하여 적당한 크기의 사각형을 만든 후 barRect에 저장
+        SetRect(&barR, p.x - 50, p.y - 15, p.x + 50, p.y + 15); //SetRect : 지정된 사각형의 좌표를 설정
+        OffsetRect(&barR, 0, 300); //OffsetRect : 지정된 오프셋만큼 지정된 사각형을 이동
     }
     break;
+    case WM_KEYDOWN:
+    {
+        switch (wParam)
+        {
+        case VK_LEFT:
+        {
+            alphaX = -5;
+            OffsetRect(&barR, alphaX * 2, 0);
+            InvalidateRect(hWnd, NULL, TRUE); 
+            // InvalidateRect : RECT라는 구조체로 지정한 하나의 공간을 다시 그리거나 출력
+        }
+            break;
+        case VK_RIGHT:
+        {
+            alphaX = 5;
+            OffsetRect(&barR, alphaX * 2, 0);
+            InvalidateRect(hWnd, NULL, TRUE);
+        }
+        break;
+        }
+    }
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
             hdc = BeginPaint(hWnd, &ps);  //문자열에 쓰고 해당 문자열 출력
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            TextOut(hdc, mPoint.x,mPoint.y, mStr, _tcslen(mStr)); //문자열 출력
+            hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255)); //파란선 생성
+            hOldPen = (HPEN)SelectObject(hdc, hPen);
+            hBrush = CreateSolidBrush(RGB(0, 255, 0)); //초록 브러쉬 생성
+            hOldBrush = (HBRUSH)SelectObject(hdc, hBrush);
+            //사각형 생성
+            Rectangle(hdc, barR.left, barR.top, barR.right, barR.bottom);
+            //TODO : SelectObject에 정확한 뜻을 이해하기 어려움,, hdc에서 oldpen을 선택한다는 건가,,,,
+            SelectObject(hdc, hOldPen);
+            SelectObject(hdc, hOldBrush);
+            DeleteObject(hPen); // DeleteObject : 오브젝트 삭제
+            DeleteObject(hBrush);
             EndPaint(hWnd, &ps);
         }
         break;
-    case WM_LBUTTONDOWN:
-    {
-        mPoint.x -= 20;
-        InvalidateRect(hWnd, NULL, TRUE);
-    }
-    break;
-    case WM_RBUTTONDOWN:
-    {
-        mPoint.x += 20;
-        InvalidateRect(hWnd, NULL, TRUE);
-
-    }
-    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

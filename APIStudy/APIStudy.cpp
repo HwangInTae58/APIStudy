@@ -123,8 +123,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    HDC hdc;
+    PAINTSTRUCT ps;
+    TCHAR temp[80]; //문자열
+
     switch (message)
     {
+    
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
@@ -142,11 +147,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+    case WM_CREATE:
+    {
+        hWnd;
+    }
+    break;
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
+            hdc = BeginPaint(hWnd, &ps);  //문자열에 쓰고 해당 문자열 출력
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+            _tcscpy_s(temp, _T("너무 어렵구"));
+            TextOut(hdc, 50, 50, temp, _tcslen(temp));
             EndPaint(hWnd, &ps);
         }
         break;

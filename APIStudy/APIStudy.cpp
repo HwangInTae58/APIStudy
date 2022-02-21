@@ -125,8 +125,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     HDC hdc;
     PAINTSTRUCT ps;
-    TCHAR temp[80]; //문자열
-
+    static TCHAR mStr[80]; //문자열
+    static POINT mPoint;
+    static RECT clientR;
+    HINSTANCE g_hlnst;
+    HWND hWndMain;
+    int chSize = 8;
     switch (message)
     {
     
@@ -149,7 +153,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_CREATE:
     {
-        hWnd;
+       hWndMain = hWnd;
+       _tcscpy_s(mStr, _T("MOVING")); //문자열에 쓰는 방법
+       GetClientRect(hWnd, &clientR);
+
+       mPoint = CenterPoint(clientR);
+       mPoint.x -= (_tcslen(mStr) * chSize) / 2; //문자열 정중앙의 위치 계산
     }
     break;
     case WM_PAINT:
@@ -157,11 +166,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             hdc = BeginPaint(hWnd, &ps);  //문자열에 쓰고 해당 문자열 출력
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            _tcscpy_s(temp, _T("너무 어렵구"));
-            TextOut(hdc, 50, 50, temp, _tcslen(temp));
+            TextOut(hdc, mPoint.x,mPoint.y, mStr, _tcslen(mStr)); //문자열 출력
             EndPaint(hWnd, &ps);
         }
         break;
+    case WM_LBUTTONDOWN:
+    {
+        mPoint.x -= 20;
+        InvalidateRect(hWnd, NULL, TRUE);
+    }
+    break;
+    case WM_RBUTTONDOWN:
+    {
+        mPoint.x += 20;
+        InvalidateRect(hWnd, NULL, TRUE);
+
+    }
+    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

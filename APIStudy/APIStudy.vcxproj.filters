@@ -27,6 +27,9 @@
     <ClInclude Include="APIStudy.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="CenterPoint.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="APIStudy.cpp">

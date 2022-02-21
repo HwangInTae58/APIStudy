@@ -13,3 +13,6 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+#include "CenterPoint.h"
+//GetClientRect() 윈도우의 크기 정보를 얻는것

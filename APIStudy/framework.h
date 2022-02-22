@@ -13,3 +13,6 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+
+// wchar_t 2바이트형char 데이터타입 : 한글을 포함하기위한 사용
